@@ -3,15 +3,18 @@ const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const app = express();
 const cors = require('cors')
 const port = 4000;
+const dotenv = require("dotenv").config();
 
 // middlewares
 app.use(cors())
 app.use(express.json())
+ 
 
+// const link ='mongodb+srv://my-balance-admin:my-balance-admin@cluster0.if4agm4.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
+// console.log(link)
 
+const uri = `${process.env.URI}`;
 
-
-const uri = "mongodb+srv://my-balance-admin:my-balance-admin@cluster0.if4agm4.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
@@ -39,7 +42,7 @@ async function run() {
             if(req.query?.email){
                 query = {userEmail: req.query.email}
             }
-            const result = await userBalanceCollection.findOne(query,{})
+            const result = await userBalanceCollection.findOne(query)
             res.send(result)
         })
 
@@ -55,6 +58,14 @@ async function run() {
                 const newBalance = await userBalanceCollection.insertOne(info)
                res.send(newBalance)
             }
+        })
+
+        app.delete('/user', async (req, res) => {
+            let query = {}
+            if(req.query?.email){
+                query = {userEmail: req.query.email}
+            }
+            
         })
 
 
@@ -86,8 +97,7 @@ async function run() {
 
 
     } finally {
-        // Ensures that the client will close when you finish/error
-        // await client.close();
+        
     }
 }
 run().catch(console.dir);
